@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Marmita da Aymeê | Monte sua Marmita</title>
+<style>
+  :root{
+    --orange:#E2661F;
+    --orange-dark:#B84A12;
+    --orange-light:#FBEADD;
+    --green:#4C7A52;
+    --green-dark:#375A3A;
+    --red:#C0392B;
+    --cream:#FFF8F0;
+    --card:#FFFFFF;
+    --text:#3B2A1E;
+    --text-soft:#7A6656;
+    --border:#EFDFCB;
+    --whatsapp:#25D366;
+    --whatsapp-dark:#1EAE55;
+    --radius:16px;
+    --shadow:0 4px 16px rgba(184,74,18,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--cream);
+    color:var(--text);
+    padding-bottom:110px;
+  }
+  .wrap{max-width:600px;margin:0 auto;padding:0 16px;}
+
+  header.hero{
+    background:linear-gradient(180deg,#FFF3E6 0%,var(--cream) 100%);
+    padding:22px 16px 18px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+  }
+  .logo{width:150px;height:150px;margin:0 auto 6px;display:block;}
+  header.hero h1{
+    margin:4px 0 2px;
+    font-size:1.5rem;
+    color:var(--orange-dark);
+    letter-spacing:.3px;
+  }
+  header.hero p{
+    margin:0;
+    color:var(--text-soft);
+    font-size:.92rem;
+  }
+
+  section{padding:20px 0;}
+  h2{
+    font-size:1.05rem;
+    margin:0 0 12px;
+    color:var(--orange-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .step-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--orange);color:#fff;font-size:.8rem;font-weight:700;
+    flex-shrink:0;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+    margin-bottom:14px;
+  }
+
+  label{
+    display:block;
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  input[type=text],input[type=tel],input[type=date]{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:1rem;
+    background:#FFFDFB;
+    color:var(--text);
+    margin-bottom:14px;
+    -webkit-appearance:none;
+  }
+  input:focus,select:focus{
+    outline:none;
+    border-color:var(--orange);
+    box-shadow:0 0 0 3px rgba(226,102,31,.15);
+  }
+  input.invalid,select.invalid{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(192,57,43,.12);
+  }
+
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  select{
+    width:100%;
+    padding:12px 38px 12px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    font-size:.95rem;
+    background:#FFFDFB url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23B84A12" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 10px center;
+    background-size:18px;
+    color:var(--text);
+    -webkit-appearance:none;appearance:none;
+  }
+  select:disabled{color:#B7A896;background-color:#F5EEE4;}
+
+  .combo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .combo-opt{
+    border:2px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--card);
+    padding:16px 6px;
+    text-align:center;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .combo-opt .n{font-size:1.6rem;font-weight:800;color:var(--orange-dark);display:block;}
+  .combo-opt .lbl{font-size:.72rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:.4px;}
+  .combo-opt.selected{
+    border-color:var(--orange);
+    background:var(--orange-light);
+    box-shadow:0 4px 14px rgba(226,102,31,.25);
+    transform:translateY(-2px);
+  }
+
+  .banner{
+    display:flex;align-items:center;gap:10px;
+    background:var(--orange-light);
+    border:1.5px dashed var(--orange);
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:.87rem;
+    color:var(--orange-dark);
+    font-weight:600;
+    margin:14px 0 4px;
+  }
+  .banner .ic{font-size:1.4rem;}
+
+  .marmita-card{position:relative;}
+  .marmita-card h3{
+    margin:0 0 12px;
+    font-size:.95rem;
+    color:var(--green-dark);
+    display:flex;align-items:center;gap:8px;
+  }
+  .marmita-card h3 .num{
+    background:var(--green);color:#fff;
+    width:26px;height:26px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.82rem;font-weight:700;
+  }
+  .marmita-card.complete{border-color:var(--green);}
+  .marmita-card.complete h3 .num{background:var(--green-dark);}
+  .check-tag{
+    position:absolute;top:14px;right:14px;
+    font-size:.72rem;font-weight:700;color:var(--green-dark);
+    background:#E7F2E8;padding:3px 9px;border-radius:20px;
+    display:none;
+  }
+  .marmita-card.complete .check-tag{display:inline-block;}
+
+  .progress-wrap{margin:6px 0 18px;}
+  .progress-track{
+    height:8px;background:var(--border);border-radius:8px;overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;background:linear-gradient(90deg,var(--orange),var(--green));
+    width:0%;transition:width .25s;
+  }
+  .progress-text{font-size:.78rem;color:var(--text-soft);margin-top:6px;text-align:right;}
+
+  .hint{font-size:.78rem;color:var(--text-soft);margin-top:-8px;margin-bottom:14px;}
+
+  .submit-bar{
+    position:fixed;left:0;right:0;bottom:0;
+    background:#fff;
+    border-top:1px solid var(--border);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 20px rgba(0,0,0,.06);
+    z-index:50;
+  }
+  .submit-bar .inner{max-width:600px;margin:0 auto;}
+  #sendBtn{
+    width:100%;
+    background:var(--whatsapp);
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    padding:15px;
+    font-size:1rem;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  #sendBtn:active{transform:scale(.98);}
+  #sendBtn:disabled{background:#BFC9C2;cursor:not-allowed;}
+  .mini-progress{font-size:.72rem;color:var(--text-soft);text-align:center;margin-top:6px;}
+
+  .error-box{
+    background:#FDEBEA;border:1.5px solid var(--red);color:var(--red);
+    border-radius:12px;padding:12px 14px;font-size:.85rem;margin-bottom:14px;
+    display:none;font-weight:600;
+  }
+  .error-box.show{display:block;}
+
+  footer{padding:26px 0 20px;}
+  .kitchen-toggle{
+    width:100%;
+    background:var(--green);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    padding:14px;
+    font-size:.95rem;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:space-between;
+    cursor:pointer;
+  }
+  .kitchen-toggle .arrow{transition:.2s;}
+  .kitchen-toggle.open .arrow{transform:rotate(180deg);}
+  .kitchen-panel{
+    display:none;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-top:none;
+    border-radius:0 0 var(--radius) var(--radius);
+    padding:16px;
+    margin-top:-4px;
+  }
+  .kitchen-panel.open{display:block;}
+  .kitchen-panel h4{
+    margin:16px 0 8px;font-size:.85rem;color:var(--orange-dark);
+    border-bottom:1px solid var(--border);padding-bottom:6px;
+  }
+  .kitchen-panel h4:first-of-type{margin-top:4px;}
+  .report-row{
+    display:flex;justify-content:space-between;
+    font-size:.86rem;padding:5px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .report-row span:last-child{font-weight:700;color:var(--green-dark);}
+  .report-empty{font-size:.82rem;color:var(--text-soft);padding:6px 0;}
+  .kitchen-config{
+    background:var(--orange-light);
+    border-radius:10px;padding:12px;margin-top:14px;
+  }
+  .kitchen-config label{font-size:.78rem;}
+  .kitchen-config input{margin-bottom:8px;}
+  .kitchen-config .save-msg{font-size:.75rem;color:var(--green-dark);font-weight:600;height:16px;}
+  .kitchen-config small{color:var(--text-soft);display:block;margin-top:2px;font-size:.72rem;}
+
+  .brand-footer{text-align:center;font-size:.72rem;color:var(--text-soft);margin-top:18px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="logo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <path id="topArc" d="M 55,205 A 148,148 0 0 1 345,205" fill="none"/>
+      <linearGradient id="potGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#F0A15C"/>
+        <stop offset="100%" stop-color="#D9711F"/>
+      </linearGradient>
+    </defs>
+    <circle cx="200" cy="200" r="172" fill="#FFFDF8"/>
+    <circle cx="200" cy="200" r="172" fill="none" stroke="#D9711F" stroke-width="2.5"/>
+    <circle cx="200" cy="200" r="163" fill="none" stroke="#D9711F" stroke-width="1.2"/>
+
+    <text font-family="Georgia, 'Times New Roman', serif" font-size="34" font-style="italic" font-weight="600" fill="#D9711F" letter-spacing="1">
+      <textPath href="#topArc" startOffset="50%" text-anchor="middle">Marmita da Aymeê</textPath>
+    </text>
+
+    <g transform="translate(200,238)">
+      <path d="M -18,-58 C -22,-70 -12,-74 -14,-86" stroke="#E8A968" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 0,-62 C -4,-74 6,-78 4,-92" stroke="#E8A968" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 18,-58 C 14,-70 24,-74 22,-86" stroke="#E8A968" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+      <ellipse cx="0" cy="-40" rx="70" ry="14" fill="#F0A15C"/>
+      <rect x="-70" y="-40" width="140" height="10" fill="#E8894A"/>
+      <path d="M -8,-52 L 0,-60 L 8,-52 C 8,-46 -8,-46 -8,-52 Z" fill="#C0392B"/>
+
+      <path d="M -66,-30 C -66,20 -54,58 0,58 C 54,58 66,20 66,-30 Z" fill="url(#potGrad)"/>
+      <path d="M -66,-30 L 66,-30 L 62,-18 L -62,-18 Z" fill="#C05F19"/>
+      <rect x="-92" y="-34" width="26" height="16" rx="8" fill="none" stroke="#D9711F" stroke-width="6"/>
+      <rect x="66" y="-34" width="26" height="16" rx="8" fill="none" stroke="#D9711F" stroke-width="6"/>
+
+      <path d="M 0,-2 C -14,-14 -30,-2 -18,12 C -10,20 0,28 0,28 C 0,28 10,20 18,12 C 30,-2 14,-14 0,-2 Z" fill="#FFF5E8"/>
+
+      <path d="M -66,50 C -40,66 -20,40 0,54 C 20,68 40,42 66,54" stroke="#E8A968" stroke-width="3" fill="none" opacity=".8"/>
+    </g>
+
+    <text x="200" y="330" font-family="Georgia, serif" font-size="30" font-style="italic" fill="#C0392B" text-anchor="middle">caseira</text>
+
+    <g stroke="#E3B778" stroke-width="2" fill="#E3B778">
+      <path d="M 62,338 C 40,330 26,312 24,290" fill="none"/>
+      <ellipse cx="30" cy="300" rx="6" ry="3" transform="rotate(-40 30 300)"/>
+      <ellipse cx="27" cy="315" rx="6" ry="3" transform="rotate(-55 27 315)"/>
+      <ellipse cx="38" cy="330" rx="6" ry="3" transform="rotate(-25 38 330)"/>
+      <path d="M 338,338 C 360,330 374,312 376,290" fill="none"/>
+      <ellipse cx="370" cy="300" rx="6" ry="3" transform="rotate(40 370 300)"/>
+      <ellipse cx="373" cy="315" rx="6" ry="3" transform="rotate(55 373 315)"/>
+      <ellipse cx="362" cy="330" rx="6" ry="3" transform="rotate(25 362 330)"/>
+    </g>
+    <path d="M 200,344 C 197,340 192,341 192,346 C 192,350 200,355 200,355 C 200,355 208,350 208,346 C 208,341 203,340 200,344 Z" fill="#C0392B"/>
+  </svg>
+  <h1>Marmita da Aymeê</h1>
+  <p>Monte sua marmita do jeito que você gosta 🧡</p>
+</header>
+
+<div class="wrap">
+
+  <div class="error-box" id="errorBox"></div>
+
+  <section id="dadosSection">
+    <h2><span class="step-badge">1</span> Seus dados</h2>
+    <div class="card">
+      <div class="field">
+        <label for="nome">Nome completo *</label>
+        <input type="text" id="nome" placeholder="Digite seu nome completo">
+      </div>
+      <div class="field">
+        <label for="telefone">Telefone / WhatsApp *</label>
+        <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="dataEntrega">Data desejada de entrega (opcional)</label>
+        <input type="date" id="dataEntrega">
+      </div>
+    </div>
+  </section>
+
+  <section id="comboSection">
+    <h2><span class="step-badge">2</span> Escolha o combo</h2>
+    <div class="combo-grid" id="comboGrid">
+      <div class="combo-opt" data-size="5">
+        <span class="n">5</span>
+        <span class="lbl">Marmitas</span>
+      </div>
+      <div class="combo-opt" data-size="7">
+        <span class="n">7</span>
+        <span class="lbl">Marmitas</span>
+      </div>
+      <div class="combo-opt" data-size="10">
+        <span class="n">10</span>
+        <span class="lbl">Marmitas</span>
+      </div>
+    </div>
+    <div class="banner" id="incluBanner" style="display:none;">
+      <span class="ic">🫘🥗</span>
+      <span>Feijão e Salada acompanham automaticamente <u>todas</u> as marmitas do seu pedido!</span>
+    </div>
+  </section>
+
+  <section id="montagemSection" style="display:none;">
+    <h2><span class="step-badge">3</span> Monte cada marmita</h2>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">0 de 0 marmitas montadas</div>
+    </div>
+    <div id="marmitasContainer"></div>
+  </section>
+
+</div>
+
+<div class="submit-bar">
+  <div class="inner">
+    <button id="sendBtn">📲 Enviar Pedido via WhatsApp</button>
+    <div class="mini-progress" id="miniProgress">Preencha seus dados e monte suas marmitas para continuar</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <button class="kitchen-toggle" id="kitchenToggle">
+      <span>👩‍🍳 Relatório de Produção (Cozinha)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="kitchen-panel" id="kitchenPanel">
+      <div class="report-row"><span><strong>Combo selecionado</strong></span><span id="repCombo">—</span></div>
+
+      <h4>🍖 Proteínas / Base</h4>
+      <div id="repProtein"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
+
+      <h4>🍚 Guarnição Primária</h4>
+      <div id="repPrimary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
+
+      <h4>🥦 Guarnição Secundária</h4>
+      <div id="repSecondary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
+
+      <h4>➕ Fixos</h4>
+      <div id="repFixed"><div class="report-empty">Selecione um combo.</div></div>
+
+      <div class="kitchen-config">
+        <label for="kitchenNumber">Número de WhatsApp para receber os pedidos (com DDD)</label>
+        <input type="tel" id="kitchenNumber" placeholder="Ex: 11987654321">
+        <div class="save-msg" id="saveMsg"></div>
+        <small>Salvo neste dispositivo. Para que funcione automaticamente em todos os celulares dos clientes, edite também a constante <code>DEFAULT_KITCHEN_WHATSAPP</code> no início do arquivo index.html.</small>
+      </div>
+    </div>
+  </footer>
+  <div class="brand-footer">Marmita da Aymeê Caseira · feito com 🧡</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Edite este número (com DDI+DDD, só dígitos) para que TODOS os clientes
+  // enviem o pedido para o WhatsApp da cozinha sem precisar configurar nada.
+  var DEFAULT_KITCHEN_WHATSAPP = "";
+
+  var PROTEINAS_SIMPLES = [
+    "Bolinho de carne recheado com requeijão",
+    "Bife a rolê recheado com linguiça, cenoura e bacon ao molho madeira",
+    "Frango à parmegiana",
+    "Coxa ou sobrecoxa assada empanada",
+    "Iscas de carne",
+    "Frango ao molho de mostarda",
+    "Almôndegas",
+    "Strogonoff de frango",
+    "Carne moída à primavera",
+    "Frango assado",
+    "Bisteca de porco",
+    "Carne de panela",
+    "Fricassê de frango",
+    "Frango grelhado"
+  ];
+
+  // Só libera Arroz como guarnição primária (massas ficam ocultas)
+  var PROTEINA_SO_ARROZ = [
+    "Panqueca de espinafre com carne",
+    "Panqueca de espinafre com frango",
+    "Lasanha de carne",
+    "Lasanha de frango",
+    "Nhoque à bolonhesa",
+    "Escondidinho de moranga com carne desfiada",
+    "Escondidinho de aipim com carne",
+    "Escondidinho de Batata com carne"
+  ];
+
+  // Só libera Massas como guarnição primária (arroz fica oculto)
+  var PROTEINA_SO_MASSA = [
+    "Arroz tropeiro",
+    "Arroz carreteiro",
+    "Risoto de Iscas",
+    "Risoto de Frango",
+    "Risoto de Calabresa"
+  ];
+
+  var GUARNICAO_MASSAS = ["Espaguete integral", "Espaguete", "Penne"];
+  var GUARNICAO_ARROZ = ["Arroz integral", "Arroz branco", "Arroz com brócolis"];
+
+  var GUARNICAO_SECUNDARIA = [
+    "Legumes salteados (cenoura, brócolis e couve-flor)",
+    "Couve refogada na manteiga e alho",
+    "Couve refogada",
+    "Purê de batatas",
+    "Aipim",
+    "Batata-doce",
+    "Suflê de legumes",
+    "Legumes no vapor",
+    "Brócolis no vapor",
+    "Filetes de moranga",
+    "Moranga caramelizada",
+    "Moranga refogada",
+    "Farofa agridoce",
+    "Batata assada"
+  ];
+
+  function proteinGroupOf(name){
+    if (PROTEINA_SO_ARROZ.indexOf(name) !== -1) return "soArroz";
+    if (PROTEINA_SO_MASSA.indexOf(name) !== -1) return "soMassa";
+    if (PROTEINAS_SIMPLES.indexOf(name) !== -1) return "simples";
+    return null;
+  }
+
+  var state = {
+    comboSize: null,
+    marmitas: []
+  };
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  var nomeEl = $("nome"), telefoneEl = $("telefone"), dataEntregaEl = $("dataEntrega");
+  var comboGrid = $("comboGrid");
+  var incluBanner = $("incluBanner");
+  var montagemSection = $("montagemSection");
+  var marmitasContainer = $("marmitasContainer");
+  var progressFill = $("progressFill");
+  var progressText = $("progressText");
+  var sendBtn = $("sendBtn");
+  var miniProgress = $("miniProgress");
+  var errorBox = $("errorBox");
+
+  function optionsHtml(list, selected){
+    return list.map(function(item){
+      var sel = item === selected ? " selected" : "";
+      return '<option value="'+escapeAttr(item)+'"'+sel+'>'+escapeHtml(item)+'</option>';
+    }).join("");
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function escapeAttr(str){ return escapeHtml(str); }
+
+  function proteinSelectHtml(){
+    return '<option value="" disabled selected>Selecione a proteína / base</option>'+
+      '<optgroup label="🍖 Proteínas Simples (libera Massas e Arroz)">'+optionsHtml(PROTEINAS_SIMPLES)+'</optgroup>'+
+      '<optgroup label="🍲 Proteína + Guarnição (acompanha Arroz)">'+optionsHtml(PROTEINA_SO_ARROZ)+'</optgroup>'+
+      '<optgroup label="🍲 Proteína + Guarnição (acompanha Massas)">'+optionsHtml(PROTEINA_SO_MASSA)+'</optgroup>';
+  }
+
+  function primarySelectHtml(group){
+    if (!group){
+      return '<option value="" disabled selected>Escolha a proteína primeiro</option>';
+    }
+    var html = '<option value="" disabled selected>Selecione a guarnição primária</option>';
+    if (group === "simples" || group === "soMassa"){
+      html += '<optgroup label="🍝 Massas">'+optionsHtml(GUARNICAO_MASSAS)+'</optgroup>';
+    }
+    if (group === "simples" || group === "soArroz"){
+      html += '<optgroup label="🍚 Arroz">'+optionsHtml(GUARNICAO_ARROZ)+'</optgroup>';
+    }
+    return html;
+  }
+
+  function secondarySelectHtml(){
+    return '<option value="" disabled selected>Selecione a guarnição secundária</option>'+optionsHtml(GUARNICAO_SECUNDARIA);
+  }
+
+  comboGrid.addEventListener("click", function(e){
+    var opt = e.target.closest(".combo-opt");
+    if (!opt) return;
+    var size = parseInt(opt.getAttribute("data-size"), 10);
+    if (state.marmitas.length > 0 && state.comboSize !== size){
+      var hasData = state.marmitas.some(function(m){ return m.protein || m.primary || m.secondary; });
+      if (hasData && !confirm("Trocar o combo vai reiniciar a montagem das marmitas. Deseja continuar?")) return;
+    }
+    state.comboSize = size;
+    Array.prototype.forEach.call(comboGrid.children, function(c){ c.classList.remove("selected"); });
+    opt.classList.add("selected");
+    incluBanner.style.display = "flex";
+    montagemSection.style.display = "block";
+    buildMarmitas(size);
+    updateAll();
+  });
+
+  function buildMarmitas(n){
+    state.marmitas = [];
+    var html = "";
+    for (var i=0; i<n; i++){
+      state.marmitas.push({ protein:"", group:null, primary:"", secondary:"" });
+      html += ''+
+      '<div class="card marmita-card" data-index="'+i+'">'+
+        '<span class="check-tag">✔ completa</span>'+
+        '<h3><span class="num">'+(i+1)+'</span> Marmita '+(i+1)+'</h3>'+
+        '<div class="field">'+
+          '<label>Proteína / Base</label>'+
+          '<select class="protein-select" data-index="'+i+'">'+proteinSelectHtml()+'</select>'+
+        '</div>'+
+        '<div class="field">'+
+          '<label>Guarnição Primária</label>'+
+          '<select class="primary-select" data-index="'+i+'" disabled>'+primarySelectHtml(null)+'</select>'+
+        '</div>'+
+        '<div class="field" style="margin-bottom:0;">'+
+          '<label>Guarnição Secundária</label>'+
+          '<select class="secondary-select" data-index="'+i+'">'+secondarySelectHtml()+'</select>'+
+        '</div>'+
+      '</div>';
+    }
+    marmitasContainer.innerHTML = html;
+  }
+
+  marmitasContainer.addEventListener("change", function(e){
+    var t = e.target;
+    var idx = parseInt(t.getAttribute("data-index"), 10);
+    if (isNaN(idx)) return;
+    var m = state.marmitas[idx];
+    var card = t.closest(".marmita-card");
+
+    if (t.classList.contains("protein-select")){
+      m.protein = t.value;
+      m.group = proteinGroupOf(t.value);
+      m.primary = "";
+      var primarySel = card.querySelector(".primary-select");
+      primarySel.innerHTML = primarySelectHtml(m.group);
+      primarySel.disabled = false;
+      primarySel.classList.remove("invalid");
+    } else if (t.classList.contains("primary-select")){
+      m.primary = t.value;
+    } else if (t.classList.contains("secondary-select")){
+      m.secondary = t.value;
+    }
+    t.classList.remove("invalid");
+    refreshCardState(card, m);
+    updateAll();
+  });
+
+  function refreshCardState(card, m){
+    var complete = !!(m.protein && m.primary && m.secondary);
+    card.classList.toggle("complete", complete);
+  }
+
+  function countCompleted(){
+    return state.marmitas.filter(function(m){ return m.protein && m.primary && m.secondary; }).length;
+  }
+
+  function updateProgress(){
+    var total = state.marmitas.length;
+    var done = countCompleted();
+    var pct = total ? Math.round((done/total)*100) : 0;
+    progressFill.style.width = pct+"%";
+    progressText.textContent = done+" de "+total+" marmitas montadas";
+  }
+
+  function clientReady(){
+    return nomeEl.value.trim().length > 0 && telefoneEl.value.trim().length > 0;
+  }
+
+  function orderReady(){
+    return state.comboSize && state.marmitas.length === state.comboSize && countCompleted() === state.comboSize && clientReady();
+  }
+
+  function updateSubmitBar(){
+    var ready = orderReady();
+    sendBtn.disabled = !ready;
+    if (ready){
+      miniProgress.textContent = "Tudo pronto! Toque para enviar seu pedido.";
+    } else if (!state.comboSize){
+      miniProgress.textContent = "Escolha um combo para começar.";
+    } else if (!clientReady()){
+      miniProgress.textContent = "Preencha seu nome e telefone.";
+    } else {
+      miniProgress.textContent = countCompleted()+" de "+state.comboSize+" marmitas montadas — falta pouco!";
+    }
+  }
+
+  function updateReport(){
+    var repCombo = $("repCombo");
+    repCombo.textContent = state.comboSize ? state.comboSize+" marmitas" : "—";
+
+    var counts = { protein:{}, primary:{}, secondary:{} };
+    state.marmitas.forEach(function(m){
+      if (m.protein) counts.protein[m.protein] = (counts.protein[m.protein]||0)+1;
+      if (m.primary) counts.primary[m.primary] = (counts.primary[m.primary]||0)+1;
+      if (m.secondary) counts.secondary[m.secondary] = (counts.secondary[m.secondary]||0)+1;
+    });
+
+    renderReportGroup("repProtein", counts.protein);
+    renderReportGroup("repPrimary", counts.primary);
+    renderReportGroup("repSecondary", counts.secondary);
+
+    var fixedEl = $("repFixed");
+    if (state.comboSize){
+      fixedEl.innerHTML =
+        '<div class="report-row"><span>Feijão (porções)</span><span>'+state.comboSize+'</span></div>'+
+        '<div class="report-row"><span>Salada (porções)</span><span>'+state.comboSize+'</span></div>';
+    } else {
+      fixedEl.innerHTML = '<div class="report-empty">Selecione um combo.</div>';
+    }
+  }
+
+  function renderReportGroup(elId, obj){
+    var el = $(elId);
+    var keys = Object.keys(obj);
+    if (!keys.length){
+      el.innerHTML = '<div class="report-empty">Nenhuma marmita montada ainda.</div>';
+      return;
+    }
+    keys.sort(function(a,b){ return obj[b]-obj[a]; });
+    el.innerHTML = keys.map(function(k){
+      return '<div class="report-row"><span>'+escapeHtml(k)+'</span><span>'+obj[k]+'x</span></div>';
+    }).join("");
+  }
+
+  function updateAll(){
+    updateProgress();
+    updateSubmitBar();
+    updateReport();
+  }
+
+  nomeEl.addEventListener("input", function(){ nomeEl.classList.remove("invalid"); updateAll(); });
+  telefoneEl.addEventListener("input", function(){ telefoneEl.classList.remove("invalid"); updateAll(); });
+
+  function formatDateBR(iso){
+    if (!iso) return "";
+    var parts = iso.split("-");
+    if (parts.length !== 3) return iso;
+    return parts[2]+"/"+parts[1]+"/"+parts[0];
+  }
+
+  function showError(msg){
+    errorBox.textContent = msg;
+    errorBox.classList.add("show");
+    errorBox.scrollIntoView({ behavior:"smooth", block:"center" });
+    setTimeout(function(){ errorBox.classList.remove("show"); }, 5000);
+  }
+
+  function validateAndHighlight(){
+    var firstInvalid = null;
+
+    if (!nomeEl.value.trim()){
+      nomeEl.classList.add("invalid");
+      firstInvalid = firstInvalid || nomeEl;
+    }
+    if (!telefoneEl.value.trim()){
+      telefoneEl.classList.add("invalid");
+      firstInvalid = firstInvalid || telefoneEl;
+    }
+    if (!state.comboSize){
+      showError("Escolha um combo de marmitas para continuar.");
+      return false;
+    }
+
+    var cards = marmitasContainer.querySelectorAll(".marmita-card");
+    state.marmitas.forEach(function(m, i){
+      var card = cards[i];
+      if (!m.protein){
+        card.querySelector(".protein-select").classList.add("invalid");
+        firstInvalid = firstInvalid || card.querySelector(".protein-select");
+      }
+      if (!m.primary){
+        card.querySelector(".primary-select").classList.add("invalid");
+        firstInvalid = firstInvalid || card.querySelector(".primary-select");
+      }
+      if (!m.secondary){
+        card.querySelector(".secondary-select").classList.add("invalid");
+        firstInvalid = firstInvalid || card.querySelector(".secondary-select");
+      }
+    });
+
+    if (firstInvalid){
+      showError("Preencha todos os campos obrigatórios destacados em vermelho.");
+      firstInvalid.scrollIntoView({ behavior:"smooth", block:"center" });
+      return false;
+    }
+    return true;
+  }
+
+  function buildMessage(){
+    var lines = [];
+    lines.push("🍱 *NOVO PEDIDO - MARMITA DA AYMEÊ*");
+    lines.push("");
+    lines.push("👤 *Cliente:* "+nomeEl.value.trim());
+    lines.push("📱 *Telefone:* "+telefoneEl.value.trim());
+    if (dataEntregaEl.value){
+      lines.push("📅 *Data desejada de entrega:* "+formatDateBR(dataEntregaEl.value));
+    }
+    lines.push("📦 *Combo:* "+state.comboSize+" Marmitas");
+    lines.push("");
+    lines.push("✅ Feijão e Salada inclusos automaticamente em todas as marmitas");
+    lines.push("");
+    state.marmitas.forEach(function(m, i){
+      lines.push("*Marmita "+(i+1)+":*");
+      lines.push("🍖 Proteína: "+m.protein);
+      lines.push("🍚 Guarnição Primária: "+m.primary);
+      lines.push("🥦 Guarnição Secundária: "+m.secondary);
+      lines.push("");
+    });
+    lines.push("------------------------------");
+    lines.push("*Total: "+state.comboSize+" marmitas*");
+    return lines.join("\n");
+  }
+
+  sendBtn.addEventListener("click", function(){
+    if (!validateAndHighlight()) return;
+    var msg = buildMessage();
+    var encoded = encodeURIComponent(msg);
+    var number = (kitchenNumberEl.value || DEFAULT_KITCHEN_WHATSAPP || "").replace(/\D/g,"");
+    var url = number ? ("https://wa.me/"+number+"?text="+encoded) : ("https://api.whatsapp.com/send?text="+encoded);
+    window.open(url, "_blank");
+  });
+
+  var kitchenToggle = $("kitchenToggle");
+  var kitchenPanel = $("kitchenPanel");
+  var kitchenNumberEl = $("kitchenNumber");
+  var saveMsg = $("saveMsg");
+  var STORAGE_KEY = "marmita_aymee_kitchen_whatsapp";
+
+  kitchenNumberEl.value = localStorage.getItem(STORAGE_KEY) || DEFAULT_KITCHEN_WHATSAPP || "";
+
+  kitchenToggle.addEventListener("click", function(){
+    var open = kitchenPanel.classList.toggle("open");
+    kitchenToggle.classList.toggle("open", open);
+  });
+
+  var saveTimer = null;
+  kitchenNumberEl.addEventListener("input", function(){
+    localStorage.setItem(STORAGE_KEY, kitchenNumberEl.value.trim());
+    saveMsg.textContent = "Número salvo ✔";
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ saveMsg.textContent = ""; }, 1800);
+  });
+
+  updateAll();
+})();
+</script>
+</body>
+</html>
