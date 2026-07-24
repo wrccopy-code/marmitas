@@ -131,6 +131,7 @@
   }
   .combo-opt .n{font-size:1.6rem;font-weight:800;color:var(--orange-dark);display:block;}
   .combo-opt .lbl{font-size:.72rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:.4px;}
+  .combo-opt .price{font-size:.82rem;color:var(--green-dark);font-weight:700;display:block;margin-top:4px;}
   .combo-opt.selected{
     border-color:var(--orange);
     background:var(--orange-light);
@@ -266,6 +267,29 @@
   .kitchen-config small{color:var(--text-soft);display:block;margin-top:2px;font-size:.72rem;}
 
   .brand-footer{text-align:center;font-size:.72rem;color:var(--text-soft);margin-top:18px;}
+
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(59,42,30,.55);
+    display:none;align-items:center;justify-content:center;
+    z-index:200;padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:#fff;border-radius:20px;
+    padding:28px 22px;max-width:360px;width:100%;
+    text-align:center;box-shadow:0 16px 44px rgba(0,0,0,.28);
+  }
+  .modal-emoji{font-size:2.4rem;margin-bottom:6px;}
+  .modal-box h3{margin:0 0 10px;color:var(--orange-dark);font-size:1.15rem;}
+  .modal-box p{margin:0 0 20px;font-size:.9rem;color:var(--text);line-height:1.5;}
+  .modal-actions{display:flex;flex-direction:column;gap:10px;}
+  .modal-btn{
+    border:none;border-radius:12px;padding:13px;
+    font-size:.92rem;font-weight:700;cursor:pointer;
+  }
+  .modal-btn.primary{background:var(--whatsapp);color:#fff;}
+  .modal-btn.secondary{background:var(--orange-light);color:var(--orange-dark);}
 </style>
 </head>
 <body>
@@ -349,17 +373,20 @@
   <section id="comboSection">
     <h2><span class="step-badge">2</span> Escolha o combo</h2>
     <div class="combo-grid" id="comboGrid">
-      <div class="combo-opt" data-size="5">
+      <div class="combo-opt" data-size="5" data-price="140">
         <span class="n">5</span>
         <span class="lbl">Marmitas</span>
+        <span class="price">R$ 140,00</span>
       </div>
-      <div class="combo-opt" data-size="7">
+      <div class="combo-opt" data-size="7" data-price="182">
         <span class="n">7</span>
         <span class="lbl">Marmitas</span>
+        <span class="price">R$ 182,00</span>
       </div>
-      <div class="combo-opt" data-size="10">
+      <div class="combo-opt" data-size="10" data-price="240">
         <span class="n">10</span>
         <span class="lbl">Marmitas</span>
+        <span class="price">R$ 240,00</span>
       </div>
     </div>
     <div class="banner" id="incluBanner" style="display:none;">
@@ -401,6 +428,9 @@
       <h4>🍚 Guarnição Primária</h4>
       <div id="repPrimary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
 
+      <h4>🧄 Molho (massas)</h4>
+      <div id="repSauce"><div class="report-empty">Nenhuma marmita com massa ainda.</div></div>
+
       <h4>🥦 Guarnição Secundária</h4>
       <div id="repSecondary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
 
@@ -416,6 +446,18 @@
     </div>
   </footer>
   <div class="brand-footer">Marmita da Aymeê Caseira · feito com 🧡</div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-emoji">🎉</div>
+    <h3>Pedido pronto!</h3>
+    <p>Vamos te encaminhar para o WhatsApp para confirmar os detalhes do seu pedido. A partir daqui, todo o atendimento — confirmação, forma de pagamento e entrega — continua por lá. 💬</p>
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="modalConfirm">Continuar no WhatsApp</button>
+      <button class="modal-btn secondary" id="modalCancel">Voltar e revisar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -466,6 +508,13 @@
 
   var GUARNICAO_MASSAS = ["Espaguete integral", "Espaguete", "Penne"];
   var GUARNICAO_ARROZ = ["Arroz integral", "Arroz branco", "Arroz com brócolis"];
+  var MOLHOS = ["Molho bechamel", "Molho de tomate assado", "Molho 4 queijos"];
+
+  var NONE_PROTEIN = "Sem proteína";
+  var NONE_PRIMARY = "Sem guarnição primária";
+  var NONE_SECONDARY = "Sem guarnição secundária";
+
+  var COMBO_PRICES = { 5: 140, 7: 182, 10: 240 };
 
   var GUARNICAO_SECUNDARIA = [
     "Legumes salteados (cenoura, brócolis e couve-flor)",
@@ -485,14 +534,26 @@
   ];
 
   function proteinGroupOf(name){
+    if (name === NONE_PROTEIN) return "none";
     if (PROTEINA_SO_ARROZ.indexOf(name) !== -1) return "soArroz";
     if (PROTEINA_SO_MASSA.indexOf(name) !== -1) return "soMassa";
     if (PROTEINAS_SIMPLES.indexOf(name) !== -1) return "simples";
     return null;
   }
 
+  function isMassa(name){
+    return GUARNICAO_MASSAS.indexOf(name) !== -1;
+  }
+
+  function marmitaComplete(m){
+    if (!m.protein || !m.primary || !m.secondary) return false;
+    if (isMassa(m.primary) && !m.sauce) return false;
+    return true;
+  }
+
   var state = {
     comboSize: null,
+    comboPrice: null,
     marmitas: []
   };
 
@@ -525,6 +586,7 @@
 
   function proteinSelectHtml(){
     return '<option value="" disabled selected>Selecione a proteína / base</option>'+
+      '<option value="'+escapeAttr(NONE_PROTEIN)+'">🚫 Sem proteína</option>'+
       '<optgroup label="🍖 Proteínas Simples (libera Massas e Arroz)">'+optionsHtml(PROTEINAS_SIMPLES)+'</optgroup>'+
       '<optgroup label="🍲 Proteína + Guarnição (acompanha Arroz)">'+optionsHtml(PROTEINA_SO_ARROZ)+'</optgroup>'+
       '<optgroup label="🍲 Proteína + Guarnição (acompanha Massas)">'+optionsHtml(PROTEINA_SO_MASSA)+'</optgroup>';
@@ -535,17 +597,24 @@
       return '<option value="" disabled selected>Escolha a proteína primeiro</option>';
     }
     var html = '<option value="" disabled selected>Selecione a guarnição primária</option>';
-    if (group === "simples" || group === "soMassa"){
+    html += '<option value="'+escapeAttr(NONE_PRIMARY)+'">🚫 Sem guarnição primária</option>';
+    if (group === "simples" || group === "none" || group === "soMassa"){
       html += '<optgroup label="🍝 Massas">'+optionsHtml(GUARNICAO_MASSAS)+'</optgroup>';
     }
-    if (group === "simples" || group === "soArroz"){
+    if (group === "simples" || group === "none" || group === "soArroz"){
       html += '<optgroup label="🍚 Arroz">'+optionsHtml(GUARNICAO_ARROZ)+'</optgroup>';
     }
     return html;
   }
 
   function secondarySelectHtml(){
-    return '<option value="" disabled selected>Selecione a guarnição secundária</option>'+optionsHtml(GUARNICAO_SECUNDARIA);
+    return '<option value="" disabled selected>Selecione a guarnição secundária</option>'+
+      '<option value="'+escapeAttr(NONE_SECONDARY)+'">🚫 Sem guarnição secundária</option>'+
+      optionsHtml(GUARNICAO_SECUNDARIA);
+  }
+
+  function sauceSelectHtml(){
+    return '<option value="" disabled selected>Selecione o molho</option>'+optionsHtml(MOLHOS);
   }
 
   comboGrid.addEventListener("click", function(e){
@@ -557,6 +626,7 @@
       if (hasData && !confirm("Trocar o combo vai reiniciar a montagem das marmitas. Deseja continuar?")) return;
     }
     state.comboSize = size;
+    state.comboPrice = parseInt(opt.getAttribute("data-price"), 10);
     Array.prototype.forEach.call(comboGrid.children, function(c){ c.classList.remove("selected"); });
     opt.classList.add("selected");
     incluBanner.style.display = "flex";
@@ -569,7 +639,7 @@
     state.marmitas = [];
     var html = "";
     for (var i=0; i<n; i++){
-      state.marmitas.push({ protein:"", group:null, primary:"", secondary:"" });
+      state.marmitas.push({ protein:"", group:null, primary:"", sauce:"", secondary:"" });
       html += ''+
       '<div class="card marmita-card" data-index="'+i+'">'+
         '<span class="check-tag">✔ completa</span>'+
@@ -581,6 +651,10 @@
         '<div class="field">'+
           '<label>Guarnição Primária</label>'+
           '<select class="primary-select" data-index="'+i+'" disabled>'+primarySelectHtml(null)+'</select>'+
+        '</div>'+
+        '<div class="field sauce-field" data-index="'+i+'" style="display:none;">'+
+          '<label>Molho da massa</label>'+
+          '<select class="sauce-select" data-index="'+i+'">'+sauceSelectHtml()+'</select>'+
         '</div>'+
         '<div class="field" style="margin-bottom:0;">'+
           '<label>Guarnição Secundária</label>'+
@@ -602,12 +676,19 @@
       m.protein = t.value;
       m.group = proteinGroupOf(t.value);
       m.primary = "";
+      m.sauce = "";
       var primarySel = card.querySelector(".primary-select");
       primarySel.innerHTML = primarySelectHtml(m.group);
       primarySel.disabled = false;
       primarySel.classList.remove("invalid");
+      toggleSauceField(card, false);
     } else if (t.classList.contains("primary-select")){
       m.primary = t.value;
+      var showSauce = isMassa(t.value);
+      if (!showSauce) m.sauce = "";
+      toggleSauceField(card, showSauce);
+    } else if (t.classList.contains("sauce-select")){
+      m.sauce = t.value;
     } else if (t.classList.contains("secondary-select")){
       m.secondary = t.value;
     }
@@ -616,13 +697,22 @@
     updateAll();
   });
 
+  function toggleSauceField(card, show){
+    var field = card.querySelector(".sauce-field");
+    var select = card.querySelector(".sauce-select");
+    field.style.display = show ? "block" : "none";
+    if (!show){
+      select.innerHTML = sauceSelectHtml();
+      select.classList.remove("invalid");
+    }
+  }
+
   function refreshCardState(card, m){
-    var complete = !!(m.protein && m.primary && m.secondary);
-    card.classList.toggle("complete", complete);
+    card.classList.toggle("complete", marmitaComplete(m));
   }
 
   function countCompleted(){
-    return state.marmitas.filter(function(m){ return m.protein && m.primary && m.secondary; }).length;
+    return state.marmitas.filter(marmitaComplete).length;
   }
 
   function updateProgress(){
@@ -655,19 +745,25 @@
     }
   }
 
+  function formatBRL(value){
+    return "R$ "+value.toFixed(2).replace(".", ",");
+  }
+
   function updateReport(){
     var repCombo = $("repCombo");
-    repCombo.textContent = state.comboSize ? state.comboSize+" marmitas" : "—";
+    repCombo.textContent = state.comboSize ? (state.comboSize+" marmitas — "+formatBRL(state.comboPrice)) : "—";
 
-    var counts = { protein:{}, primary:{}, secondary:{} };
+    var counts = { protein:{}, primary:{}, sauce:{}, secondary:{} };
     state.marmitas.forEach(function(m){
       if (m.protein) counts.protein[m.protein] = (counts.protein[m.protein]||0)+1;
       if (m.primary) counts.primary[m.primary] = (counts.primary[m.primary]||0)+1;
+      if (m.sauce) counts.sauce[m.sauce] = (counts.sauce[m.sauce]||0)+1;
       if (m.secondary) counts.secondary[m.secondary] = (counts.secondary[m.secondary]||0)+1;
     });
 
     renderReportGroup("repProtein", counts.protein);
     renderReportGroup("repPrimary", counts.primary);
+    renderReportGroup("repSauce", counts.sauce, "Nenhuma marmita com massa ainda.");
     renderReportGroup("repSecondary", counts.secondary);
 
     var fixedEl = $("repFixed");
@@ -680,11 +776,11 @@
     }
   }
 
-  function renderReportGroup(elId, obj){
+  function renderReportGroup(elId, obj, emptyMsg){
     var el = $(elId);
     var keys = Object.keys(obj);
     if (!keys.length){
-      el.innerHTML = '<div class="report-empty">Nenhuma marmita montada ainda.</div>';
+      el.innerHTML = '<div class="report-empty">'+(emptyMsg || "Nenhuma marmita montada ainda.")+'</div>';
       return;
     }
     keys.sort(function(a,b){ return obj[b]-obj[a]; });
@@ -743,6 +839,10 @@
         card.querySelector(".primary-select").classList.add("invalid");
         firstInvalid = firstInvalid || card.querySelector(".primary-select");
       }
+      if (isMassa(m.primary) && !m.sauce){
+        card.querySelector(".sauce-select").classList.add("invalid");
+        firstInvalid = firstInvalid || card.querySelector(".sauce-select");
+      }
       if (!m.secondary){
         card.querySelector(".secondary-select").classList.add("invalid");
         firstInvalid = firstInvalid || card.querySelector(".secondary-select");
@@ -766,7 +866,7 @@
     if (dataEntregaEl.value){
       lines.push("📅 *Data desejada de entrega:* "+formatDateBR(dataEntregaEl.value));
     }
-    lines.push("📦 *Combo:* "+state.comboSize+" Marmitas");
+    lines.push("📦 *Combo:* "+state.comboSize+" Marmitas — "+formatBRL(state.comboPrice));
     lines.push("");
     lines.push("✅ Feijão e Salada inclusos automaticamente em todas as marmitas");
     lines.push("");
@@ -774,21 +874,36 @@
       lines.push("*Marmita "+(i+1)+":*");
       lines.push("🍖 Proteína: "+m.protein);
       lines.push("🍚 Guarnição Primária: "+m.primary);
+      if (m.sauce) lines.push("🧄 Molho: "+m.sauce);
       lines.push("🥦 Guarnição Secundária: "+m.secondary);
       lines.push("");
     });
     lines.push("------------------------------");
-    lines.push("*Total: "+state.comboSize+" marmitas*");
+    lines.push("*Total: "+state.comboSize+" marmitas — "+formatBRL(state.comboPrice)+"*");
     return lines.join("\n");
   }
+
+  var confirmModal = $("confirmModal");
+  var modalConfirm = $("modalConfirm");
+  var modalCancel = $("modalCancel");
+  var pendingWhatsappUrl = null;
 
   sendBtn.addEventListener("click", function(){
     if (!validateAndHighlight()) return;
     var msg = buildMessage();
     var encoded = encodeURIComponent(msg);
     var number = (kitchenNumberEl.value || DEFAULT_KITCHEN_WHATSAPP || "").replace(/\D/g,"");
-    var url = number ? ("https://wa.me/"+number+"?text="+encoded) : ("https://api.whatsapp.com/send?text="+encoded);
-    window.open(url, "_blank");
+    pendingWhatsappUrl = number ? ("https://wa.me/"+number+"?text="+encoded) : ("https://api.whatsapp.com/send?text="+encoded);
+    confirmModal.classList.add("show");
+  });
+
+  modalConfirm.addEventListener("click", function(){
+    if (pendingWhatsappUrl) window.open(pendingWhatsappUrl, "_blank");
+    confirmModal.classList.remove("show");
+  });
+
+  modalCancel.addEventListener("click", function(){
+    confirmModal.classList.remove("show");
   });
 
   var kitchenToggle = $("kitchenToggle");
