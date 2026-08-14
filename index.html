@@ -422,16 +422,16 @@
     <div class="kitchen-panel" id="kitchenPanel">
       <div class="report-row"><span><strong>Combo selecionado</strong></span><span id="repCombo">—</span></div>
 
-      <h4>🍖 Proteínas / Base</h4>
+      <h4>🍖 Proteínas</h4>
       <div id="repProtein"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
 
-      <h4>🍚 Guarnição Primária</h4>
+      <h4>🍚 Guarnição 01</h4>
       <div id="repPrimary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
 
       <h4>🧄 Molho (massas)</h4>
       <div id="repSauce"><div class="report-empty">Nenhuma marmita com massa ainda.</div></div>
 
-      <h4>🥦 Guarnição Secundária</h4>
+      <h4>🥦 Guarnição 02</h4>
       <div id="repSecondary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
 
       <h4>➕ Fixos</h4>
@@ -467,81 +467,37 @@
   // enviem o pedido para o WhatsApp da cozinha sem precisar configurar nada.
   var DEFAULT_KITCHEN_WHATSAPP = "5551980216963";
 
-  var PROTEINAS_SIMPLES = [
-    "Bolinho de carne recheado com requeijão",
-    "Bife a rolê recheado com linguiça, cenoura e bacon ao molho madeira",
-    "Frango à parmegiana",
-    "Coxa ou sobrecoxa assada empanada",
-    "Iscas de carne",
-    "Frango ao molho de mostarda",
-    "Almôndegas",
-    "Strogonoff de frango",
-    "Carne moída à primavera",
+  var PROTEINAS = [
     "Frango assado",
-    "Bisteca de porco",
-    "Carne de panela",
-    "Fricassê de frango",
-    "Frango grelhado"
+    "Strogonoff",
+    "Frango grelhado",
+    "Carne moída a primavera",
+    "Almôndegas",
+    "Panqueca de frango"
   ];
 
-  // Só libera Arroz como guarnição primária (massas ficam ocultas)
-  var PROTEINA_SO_ARROZ = [
-    "Panqueca de espinafre com carne",
-    "Panqueca de espinafre com frango",
-    "Lasanha de carne",
-    "Lasanha de frango",
-    "Nhoque à bolonhesa",
-    "Escondidinho de moranga com carne desfiada",
-    "Escondidinho de aipim com carne",
-    "Escondidinho de Batata com carne"
+  var GUARNICAO_01_ARROZ = ["Arroz integral", "Arroz branco"];
+  var GUARNICAO_01_MASSAS = ["Massa penne", "Massa espaguete integral", "Massa espaguete tradicional"];
+
+  var GUARNICAO_02 = [
+    "Batata doce",
+    "Batata assada",
+    "Legumes no vapor",
+    "Legumes salteados",
+    "Aipim",
+    "Farofinha agridoce",
+    "Moranga caramelizada",
+    "Moranga refogada"
   ];
 
-  // Só libera Massas como guarnição primária (arroz fica oculto)
-  var PROTEINA_SO_MASSA = [
-    "Arroz tropeiro",
-    "Arroz carreteiro",
-    "Risoto de Iscas",
-    "Risoto de Frango",
-    "Risoto de Calabresa"
-  ];
-
-  var GUARNICAO_MASSAS = ["Espaguete integral", "Espaguete", "Penne"];
-  var GUARNICAO_ARROZ = ["Arroz integral", "Arroz branco", "Arroz com brócolis"];
   var MOLHOS = ["Molho bechamel", "Molho de tomate assado", "Molho 4 queijos"];
 
   var NONE_PROTEIN = "Sem proteína";
-  var NONE_PRIMARY = "Sem guarnição primária";
-  var NONE_SECONDARY = "Sem guarnição secundária";
-
-  var COMBO_PRICES = { 5: 140, 7: 182, 10: 240 };
-
-  var GUARNICAO_SECUNDARIA = [
-    "Legumes salteados (cenoura, brócolis e couve-flor)",
-    "Couve refogada na manteiga e alho",
-    "Couve refogada",
-    "Purê de batatas",
-    "Aipim",
-    "Batata-doce",
-    "Suflê de legumes",
-    "Legumes no vapor",
-    "Brócolis no vapor",
-    "Filetes de moranga",
-    "Moranga caramelizada",
-    "Moranga refogada",
-    "Farofa agridoce",
-    "Batata assada"
-  ];
-
-  function proteinGroupOf(name){
-    if (name === NONE_PROTEIN) return "none";
-    if (PROTEINA_SO_ARROZ.indexOf(name) !== -1) return "soArroz";
-    if (PROTEINA_SO_MASSA.indexOf(name) !== -1) return "soMassa";
-    if (PROTEINAS_SIMPLES.indexOf(name) !== -1) return "simples";
-    return null;
-  }
+  var NONE_PRIMARY = "Sem guarnição 01";
+  var NONE_SECONDARY = "Sem guarnição 02";
 
   function isMassa(name){
-    return GUARNICAO_MASSAS.indexOf(name) !== -1;
+    return GUARNICAO_01_MASSAS.indexOf(name) !== -1;
   }
 
   function marmitaComplete(m){
@@ -584,32 +540,23 @@
   function escapeAttr(str){ return escapeHtml(str); }
 
   function proteinSelectHtml(){
-    return '<option value="" disabled selected>Selecione a proteína / base</option>'+
+    return '<option value="" disabled selected>Selecione a proteína da semana</option>'+
       '<option value="'+escapeAttr(NONE_PROTEIN)+'">🚫 Sem proteína</option>'+
-      '<optgroup label="🍖 Proteínas Simples (libera Massas e Arroz)">'+optionsHtml(PROTEINAS_SIMPLES)+'</optgroup>'+
-      '<optgroup label="🍲 Proteína + Guarnição (acompanha Arroz)">'+optionsHtml(PROTEINA_SO_ARROZ)+'</optgroup>'+
-      '<optgroup label="🍲 Proteína + Guarnição (acompanha Massas)">'+optionsHtml(PROTEINA_SO_MASSA)+'</optgroup>';
+      optionsHtml(PROTEINAS);
   }
 
-  function primarySelectHtml(group){
-    if (!group){
-      return '<option value="" disabled selected>Escolha a proteína primeiro</option>';
-    }
-    var html = '<option value="" disabled selected>Selecione a guarnição primária</option>';
-    html += '<option value="'+escapeAttr(NONE_PRIMARY)+'">🚫 Sem guarnição primária</option>';
-    if (group === "simples" || group === "none" || group === "soMassa"){
-      html += '<optgroup label="🍝 Massas">'+optionsHtml(GUARNICAO_MASSAS)+'</optgroup>';
-    }
-    if (group === "simples" || group === "none" || group === "soArroz"){
-      html += '<optgroup label="🍚 Arroz">'+optionsHtml(GUARNICAO_ARROZ)+'</optgroup>';
-    }
+  function primarySelectHtml(){
+    var html = '<option value="" disabled selected>Selecione a Guarnição 01</option>';
+    html += '<option value="'+escapeAttr(NONE_PRIMARY)+'">🚫 Sem guarnição 01</option>';
+    html += '<optgroup label="🍚 Arroz">'+optionsHtml(GUARNICAO_01_ARROZ)+'</optgroup>';
+    html += '<optgroup label="🍝 Massas">'+optionsHtml(GUARNICAO_01_MASSAS)+'</optgroup>';
     return html;
   }
 
   function secondarySelectHtml(){
-    return '<option value="" disabled selected>Selecione a guarnição secundária</option>'+
-      '<option value="'+escapeAttr(NONE_SECONDARY)+'">🚫 Sem guarnição secundária</option>'+
-      optionsHtml(GUARNICAO_SECUNDARIA);
+    return '<option value="" disabled selected>Selecione a Guarnição 02</option>'+
+      '<option value="'+escapeAttr(NONE_SECONDARY)+'">🚫 Sem guarnição 02</option>'+
+      optionsHtml(GUARNICAO_02);
   }
 
   function sauceSelectHtml(){
@@ -638,25 +585,25 @@
     state.marmitas = [];
     var html = "";
     for (var i=0; i<n; i++){
-      state.marmitas.push({ protein:"", group:null, primary:"", sauce:"", secondary:"" });
+      state.marmitas.push({ protein:"", primary:"", sauce:"", secondary:"" });
       html += ''+
       '<div class="card marmita-card" data-index="'+i+'">'+
         '<span class="check-tag">✔ completa</span>'+
         '<h3><span class="num">'+(i+1)+'</span> Marmita '+(i+1)+'</h3>'+
         '<div class="field">'+
-          '<label>Proteína / Base</label>'+
+          '<label>Proteína da Semana</label>'+
           '<select class="protein-select" data-index="'+i+'">'+proteinSelectHtml()+'</select>'+
         '</div>'+
         '<div class="field">'+
-          '<label>Guarnição Primária</label>'+
-          '<select class="primary-select" data-index="'+i+'" disabled>'+primarySelectHtml(null)+'</select>'+
+          '<label>Guarnição 01</label>'+
+          '<select class="primary-select" data-index="'+i+'">'+primarySelectHtml()+'</select>'+
         '</div>'+
         '<div class="field sauce-field" data-index="'+i+'" style="display:none;">'+
           '<label>Molho da massa</label>'+
           '<select class="sauce-select" data-index="'+i+'">'+sauceSelectHtml()+'</select>'+
         '</div>'+
         '<div class="field" style="margin-bottom:0;">'+
-          '<label>Guarnição Secundária</label>'+
+          '<label>Guarnição 02</label>'+
           '<select class="secondary-select" data-index="'+i+'">'+secondarySelectHtml()+'</select>'+
         '</div>'+
       '</div>';
@@ -673,14 +620,6 @@
 
     if (t.classList.contains("protein-select")){
       m.protein = t.value;
-      m.group = proteinGroupOf(t.value);
-      m.primary = "";
-      m.sauce = "";
-      var primarySel = card.querySelector(".primary-select");
-      primarySel.innerHTML = primarySelectHtml(m.group);
-      primarySel.disabled = false;
-      primarySel.classList.remove("invalid");
-      toggleSauceField(card, false);
     } else if (t.classList.contains("primary-select")){
       m.primary = t.value;
       var showSauce = isMassa(t.value);
@@ -872,9 +811,9 @@
     state.marmitas.forEach(function(m, i){
       lines.push("*Marmita "+(i+1)+":*");
       lines.push("🍖 Proteína: "+m.protein);
-      lines.push("🍚 Guarnição Primária: "+m.primary);
+      lines.push("🍚 Guarnição 01: "+m.primary);
       if (m.sauce) lines.push("🧄 Molho: "+m.sauce);
-      lines.push("🥦 Guarnição Secundária: "+m.secondary);
+      lines.push("🥦 Guarnição 02: "+m.secondary);
       lines.push("");
     });
     lines.push("------------------------------");
