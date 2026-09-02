@@ -291,6 +291,20 @@
   .cart-row span:last-child{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--green-dark);}
   .cart-remove{border:none;background:none;color:var(--red);font-weight:700;cursor:pointer;font-size:.95rem;padding:0 2px;}
   .cart-subtotal{text-align:right;font-weight:700;font-size:.88rem;color:var(--orange-dark);margin-top:6px;}
+
+  .toast{
+    position:fixed;left:50%;bottom:96px;
+    transform:translateX(-50%) translateY(16px);
+    background:var(--green-dark);color:#fff;
+    padding:12px 20px;border-radius:30px;
+    font-size:.85rem;font-weight:700;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:300;max-width:88%;text-align:center;
+    display:flex;align-items:center;gap:8px;justify-content:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -425,6 +439,8 @@
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 (function(){
   "use strict";
@@ -520,6 +536,15 @@
   var sendBtn = $("sendBtn");
   var miniProgress = $("miniProgress");
   var errorBox = $("errorBox");
+  var toastEl = $("toast");
+  var toastTimer = null;
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 2200);
+  }
 
   var sobremesaSection = $("sobremesaSection");
   var sobremesaYesNo = $("sobremesaYesNo");
@@ -660,6 +685,7 @@
     var card = btn.closest(".catalog-item");
     var lactose = card.querySelector(".ci-lactose").checked;
     state.sobremesaCart.push({ name: item.name, lactose: lactose, price: item.price + (lactose ? LACTOSE_EXTRA : 0) });
+    showToast("✅ Adicionado: "+item.name+(lactose ? " (Zero lactose)" : ""));
     updateAll();
   });
 
@@ -676,6 +702,7 @@
       return;
     }
     state.lancheCart.push({ name: item.name, flavor: flavor, price: item.price });
+    showToast("✅ Adicionado: "+item.name+(flavor ? " ("+flavor+")" : ""));
     updateAll();
   });
 
