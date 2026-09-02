@@ -290,6 +290,52 @@
   }
   .modal-btn.primary{background:var(--whatsapp);color:#fff;}
   .modal-btn.secondary{background:var(--orange-light);color:var(--orange-dark);}
+  .modal-total{
+    background:var(--orange-light);border-radius:10px;padding:10px 12px;
+    font-weight:700;color:var(--orange-dark);font-size:.85rem;margin-bottom:14px !important;
+  }
+
+  .yesno-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .yesno-btn{
+    border:2px solid var(--border);border-radius:12px;background:#fff;
+    padding:12px;font-size:.9rem;font-weight:700;color:var(--text);cursor:pointer;
+  }
+  .yesno-btn.selected{border-color:var(--orange);background:var(--orange-light);color:var(--orange-dark);}
+
+  .lactose-note{
+    background:var(--orange-light);border:1.5px dashed var(--orange);border-radius:12px;
+    padding:10px 12px;font-size:.8rem;color:var(--orange-dark);margin-bottom:12px;font-weight:600;
+  }
+
+  .catalog-item{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:14px;margin-bottom:10px;
+  }
+  .ci-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;}
+  .ci-name{font-weight:700;font-size:.92rem;color:var(--text);}
+  .ci-price{font-weight:700;color:var(--green-dark);font-size:.88rem;white-space:nowrap;}
+  .ci-price small{font-weight:500;color:var(--text-soft);}
+  .ci-desc{font-size:.8rem;color:var(--text-soft);margin-bottom:8px;}
+  .ci-note{font-size:.76rem;color:var(--red);font-weight:600;margin-bottom:8px;}
+  .ci-checkbox{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:500;margin-bottom:10px;cursor:pointer;}
+  .ci-checkbox input{width:18px;height:18px;}
+  .ci-flavor{margin-bottom:10px;}
+  .ci-add{
+    width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;
+    padding:10px;font-weight:700;font-size:.85rem;cursor:pointer;
+  }
+  .ci-add:active{transform:scale(.98);}
+
+  .cart-box{background:var(--orange-light);border-radius:14px;padding:12px 14px;margin-top:6px;}
+  .cart-box h4{margin:0 0 8px;font-size:.85rem;color:var(--orange-dark);border:none;padding:0;}
+  .cart-row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:.85rem;padding:6px 0;border-bottom:1px dashed rgba(184,74,18,.25);
+  }
+  .cart-row:last-child{border-bottom:none;}
+  .cart-row span:last-child{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--green-dark);}
+  .cart-remove{border:none;background:none;color:var(--red);font-weight:700;cursor:pointer;font-size:.95rem;padding:0 2px;}
+  .cart-subtotal{text-align:right;font-weight:700;font-size:.88rem;color:var(--orange-dark);margin-top:6px;}
 </style>
 </head>
 <body>
@@ -391,7 +437,7 @@
     </div>
     <div class="banner" id="incluBanner" style="display:none;">
       <span class="ic">🫘🥗</span>
-      <span>Feijão e Salada acompanham automaticamente <u>todas</u> as marmitas do seu pedido!</span>
+      <span id="incluBannerText"></span>
     </div>
   </section>
 
@@ -402,6 +448,45 @@
       <div class="progress-text" id="progressText">0 de 0 marmitas montadas</div>
     </div>
     <div id="marmitasContainer"></div>
+  </section>
+
+  <section id="sobremesaSection" style="display:none;">
+    <h2><span class="step-badge">4</span> Sobremesa</h2>
+    <div class="card">
+      <label style="margin-bottom:0;">Gostaria de adicionar sobremesa?</label>
+      <div class="yesno-grid" id="sobremesaYesNo">
+        <button type="button" class="yesno-btn" data-value="sim">Sim</button>
+        <button type="button" class="yesno-btn" data-value="nao">Não</button>
+      </div>
+    </div>
+    <div id="sobremesaCatalog" style="display:none;">
+      <div class="lactose-note">🥛 Todas as sobremesas podem ser preparadas na versão zero lactose, mediante acréscimo de R$ 2,00 ao valor original.</div>
+      <div id="sobremesaItems"></div>
+      <div class="cart-box" id="sobremesaCartBox" style="display:none;">
+        <h4>Sobremesas adicionadas</h4>
+        <div id="sobremesaCartList"></div>
+        <div class="cart-subtotal">Subtotal: <span id="sobremesaSubtotal">R$ 0,00</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="lancheSection" style="display:none;">
+    <h2><span class="step-badge">5</span> Lanches Rápidos</h2>
+    <div class="card">
+      <label style="margin-bottom:0;">Gostaria de adicionar lanches rápidos?</label>
+      <div class="yesno-grid" id="lancheYesNo">
+        <button type="button" class="yesno-btn" data-value="sim">Sim</button>
+        <button type="button" class="yesno-btn" data-value="nao">Não</button>
+      </div>
+    </div>
+    <div id="lancheCatalog" style="display:none;">
+      <div id="lancheItems"></div>
+      <div class="cart-box" id="lancheCartBox" style="display:none;">
+        <h4>Lanches adicionados</h4>
+        <div id="lancheCartList"></div>
+        <div class="cart-subtotal">Subtotal: <span id="lancheSubtotal">R$ 0,00</span></div>
+      </div>
+    </div>
   </section>
 
 </div>
@@ -437,6 +522,14 @@
       <h4>➕ Fixos</h4>
       <div id="repFixed"><div class="report-empty">Selecione um combo.</div></div>
 
+      <h4>🍰 Sobremesas</h4>
+      <div id="repSobremesa"><div class="report-empty">Nenhuma sobremesa adicionada.</div></div>
+
+      <h4>🥪 Lanches Rápidos</h4>
+      <div id="repLanche"><div class="report-empty">Nenhum lanche adicionado.</div></div>
+
+      <div class="report-row" style="margin-top:8px;"><span><strong>Valor total do pedido</strong></span><span id="repGrandTotal">—</span></div>
+
       <div class="kitchen-config">
         <label for="kitchenNumber">Número de WhatsApp para receber os pedidos (com DDD)</label>
         <input type="tel" id="kitchenNumber" placeholder="Ex: 11987654321">
@@ -451,7 +544,9 @@
   <div class="modal-box">
     <div class="modal-emoji">🎉</div>
     <h3>Pedido pronto!</h3>
-    <p>Vamos te encaminhar para o WhatsApp para confirmar os detalhes do seu pedido. A partir daqui, todo o atendimento — confirmação, forma de pagamento e entrega — continua por lá. 💬</p>
+    <p class="modal-total" id="modalTotal"></p>
+    <p>💳 Para confirmar o pedido, deverá ser realizado o pagamento de <strong>50% do valor</strong> antecipadamente.</p>
+    <p>Vamos te encaminhar para o WhatsApp para combinar o pagamento e os demais detalhes. A partir daqui, todo o atendimento continua por lá. 💬</p>
     <div class="modal-actions">
       <button class="modal-btn primary" id="modalConfirm">Continuar no WhatsApp</button>
       <button class="modal-btn secondary" id="modalCancel">Voltar e revisar</button>
@@ -468,33 +563,58 @@
   var DEFAULT_KITCHEN_WHATSAPP = "5551980216963";
 
   var PROTEINAS = [
-    "Frango assado",
-    "Strogonoff",
-    "Frango grelhado",
-    "Carne moída a primavera",
-    "Almôndegas",
-    "Panqueca de frango"
+    "Bolinho de carne recheado com brócolis",
+    "Frango à parmegiana",
+    "Escondidinho de batata com carne moída",
+    "Iscas de carne",
+    "Frango empanado na farinha panko",
+    "Bisteca suína"
   ];
 
   var GUARNICAO_01_ARROZ = ["Arroz integral", "Arroz branco"];
-  var GUARNICAO_01_MASSAS = ["Massa penne", "Massa espaguete integral", "Massa espaguete tradicional"];
+  var GUARNICAO_01_MASSAS = ["Massa Penne", "Massa Rigatoni", "Nhoque"];
 
   var GUARNICAO_02 = [
-    "Batata doce",
-    "Batata assada",
+    "Tortilha de legumes",
+    "Brócolis ao molho bechamel",
     "Legumes no vapor",
-    "Legumes salteados",
-    "Aipim",
-    "Farofinha agridoce",
-    "Moranga caramelizada",
-    "Moranga refogada"
+    "Couve refogada na manteiga e alho",
+    "Purê de batatas",
+    "Gratin de batata",
+    "Farofa agridoce",
+    "Moranga caramelizada"
   ];
 
-  var MOLHOS = ["Molho bechamel", "Molho de tomate assado", "Molho 4 queijos"];
+  var MOLHOS = ["Molho bechamel", "Molho 4 queijos"];
 
   var NONE_PROTEIN = "Sem proteína";
   var NONE_PRIMARY = "Sem guarnição 01";
   var NONE_SECONDARY = "Sem guarnição 02";
+
+  var COMBO_EXTRAS = {
+    5:  { feijao: 2, saladaText: "Não acompanha salada" },
+    7:  { feijao: 3, saladaText: "Meia porção de salada" },
+    10: { feijao: 5, saladaText: "1 porção de salada" }
+  };
+
+  var LACTOSE_EXTRA = 2;
+
+  var SOBREMESAS = [
+    { name: "Mini bolo vulcão de cenoura", price: 12 },
+    { name: "Brigadeiro de colher", price: 16 },
+    { name: "Torta de limão no pote", price: 12 },
+    { name: "Banoffee no pote", price: 12 },
+    { name: "Torta de bolacha com creme belga", price: 12 },
+    { name: "Bolo no pote Casadinho (brigadeiro preto e brigadeiro branco)", price: 12 }
+  ];
+
+  var LANCHES = [
+    { name: "Fatia de Quiche", price: 12, flavors: ["Brócolis", "Frango", "Bacon", "Cebola caramelizada com bacon"] },
+    { name: "Sanduíche natural", price: 12, desc: "Frango, alface, tomate, rúcula e maionese verde.", note: "Produto com validade curta" },
+    { name: "Empanada argentina", price: 12, flavors: ["Calabresa", "Queijo", "Frango", "Brócolis com requeijão"] },
+    { name: "Totosinho", price: 8 },
+    { name: "Mini pão recheado com calabresa", price: 8 }
+  ];
 
   function isMassa(name){
     return GUARNICAO_01_MASSAS.indexOf(name) !== -1;
@@ -509,7 +629,11 @@
   var state = {
     comboSize: null,
     comboPrice: null,
-    marmitas: []
+    marmitas: [],
+    sobremesaWanted: null,
+    lancheWanted: null,
+    sobremesaCart: [],
+    lancheCart: []
   };
 
   var $ = function(id){ return document.getElementById(id); };
@@ -517,6 +641,7 @@
   var nomeEl = $("nome"), telefoneEl = $("telefone"), dataEntregaEl = $("dataEntrega");
   var comboGrid = $("comboGrid");
   var incluBanner = $("incluBanner");
+  var incluBannerText = $("incluBannerText");
   var montagemSection = $("montagemSection");
   var marmitasContainer = $("marmitasContainer");
   var progressFill = $("progressFill");
@@ -524,6 +649,22 @@
   var sendBtn = $("sendBtn");
   var miniProgress = $("miniProgress");
   var errorBox = $("errorBox");
+
+  var sobremesaSection = $("sobremesaSection");
+  var sobremesaYesNo = $("sobremesaYesNo");
+  var sobremesaCatalog = $("sobremesaCatalog");
+  var sobremesaItemsEl = $("sobremesaItems");
+  var sobremesaCartBox = $("sobremesaCartBox");
+  var sobremesaCartList = $("sobremesaCartList");
+  var sobremesaSubtotalEl = $("sobremesaSubtotal");
+
+  var lancheSection = $("lancheSection");
+  var lancheYesNo = $("lancheYesNo");
+  var lancheCatalog = $("lancheCatalog");
+  var lancheItemsEl = $("lancheItems");
+  var lancheCartBox = $("lancheCartBox");
+  var lancheCartList = $("lancheCartList");
+  var lancheSubtotalEl = $("lancheSubtotal");
 
   function optionsHtml(list, selected){
     return list.map(function(item){
@@ -563,6 +704,142 @@
     return '<option value="" disabled selected>Selecione o molho</option>'+optionsHtml(MOLHOS);
   }
 
+  function renderSobremesaCatalog(){
+    sobremesaItemsEl.innerHTML = SOBREMESAS.map(function(item, idx){
+      return '<div class="catalog-item">'+
+        '<div class="ci-head"><span class="ci-name">'+escapeHtml(item.name)+'</span><span class="ci-price">'+formatBRL(item.price)+'</span></div>'+
+        '<label class="ci-checkbox"><input type="checkbox" class="ci-lactose"> Zero lactose (+'+formatBRL(LACTOSE_EXTRA)+')</label>'+
+        '<button type="button" class="ci-add" data-idx="'+idx+'">+ Adicionar</button>'+
+      '</div>';
+    }).join("");
+  }
+
+  function renderLancheCatalog(){
+    lancheItemsEl.innerHTML = LANCHES.map(function(item, idx){
+      var html = '<div class="catalog-item">'+
+        '<div class="ci-head"><span class="ci-name">'+escapeHtml(item.name)+'</span><span class="ci-price">'+formatBRL(item.price)+' <small>(un.)</small></span></div>';
+      if (item.desc) html += '<div class="ci-desc">'+escapeHtml(item.desc)+'</div>';
+      if (item.note) html += '<div class="ci-note">⚠️ '+escapeHtml(item.note)+'</div>';
+      if (item.flavors){
+        html += '<select class="ci-flavor"><option value="" disabled selected>Selecione o sabor</option>'+optionsHtml(item.flavors)+'</select>';
+      }
+      html += '<button type="button" class="ci-add" data-idx="'+idx+'">+ Adicionar</button>';
+      html += '</div>';
+      return html;
+    }).join("");
+  }
+
+  function cartRowsHtml(cart){
+    return cart.map(function(item, i){
+      var label = item.name;
+      if (item.flavor) label += " ("+item.flavor+")";
+      if (item.lactose) label += " — Zero lactose";
+      return '<div class="cart-row"><span>'+escapeHtml(label)+'</span><span>'+formatBRL(item.price)+' <button type="button" class="cart-remove" data-i="'+i+'">✕</button></span></div>';
+    }).join("");
+  }
+
+  function reportCartRows(cart){
+    if (!cart.length) return null;
+    var counts = {};
+    cart.forEach(function(item){
+      var label = item.name;
+      if (item.flavor) label += " ("+item.flavor+")";
+      if (item.lactose) label += " — Zero lactose";
+      counts[label] = (counts[label]||0)+1;
+    });
+    return Object.keys(counts).map(function(k){
+      return '<div class="report-row"><span>'+escapeHtml(k)+'</span><span>'+counts[k]+'x</span></div>';
+    }).join("");
+  }
+
+  function getSobremesaTotal(){
+    return state.sobremesaCart.reduce(function(s,i){ return s+i.price; }, 0);
+  }
+  function getLancheTotal(){
+    return state.lancheCart.reduce(function(s,i){ return s+i.price; }, 0);
+  }
+  function getGrandTotal(){
+    return (state.comboPrice||0) + getSobremesaTotal() + getLancheTotal();
+  }
+
+  function renderCarts(){
+    sobremesaCartList.innerHTML = cartRowsHtml(state.sobremesaCart);
+    sobremesaCartBox.style.display = state.sobremesaCart.length ? "block" : "none";
+    sobremesaSubtotalEl.textContent = formatBRL(getSobremesaTotal());
+
+    lancheCartList.innerHTML = cartRowsHtml(state.lancheCart);
+    lancheCartBox.style.display = state.lancheCart.length ? "block" : "none";
+    lancheSubtotalEl.textContent = formatBRL(getLancheTotal());
+  }
+
+  sobremesaYesNo.addEventListener("click", function(e){
+    var btn = e.target.closest(".yesno-btn");
+    if (!btn) return;
+    var wants = btn.getAttribute("data-value") === "sim";
+    state.sobremesaWanted = wants;
+    Array.prototype.forEach.call(sobremesaYesNo.children, function(b){ b.classList.remove("selected"); });
+    btn.classList.add("selected");
+    sobremesaCatalog.style.display = wants ? "block" : "none";
+    if (!wants){ state.sobremesaCart = []; }
+    updateAll();
+  });
+
+  lancheYesNo.addEventListener("click", function(e){
+    var btn = e.target.closest(".yesno-btn");
+    if (!btn) return;
+    var wants = btn.getAttribute("data-value") === "sim";
+    state.lancheWanted = wants;
+    Array.prototype.forEach.call(lancheYesNo.children, function(b){ b.classList.remove("selected"); });
+    btn.classList.add("selected");
+    lancheCatalog.style.display = wants ? "block" : "none";
+    if (!wants){ state.lancheCart = []; }
+    updateAll();
+  });
+
+  sobremesaItemsEl.addEventListener("click", function(e){
+    var btn = e.target.closest(".ci-add");
+    if (!btn) return;
+    var item = SOBREMESAS[parseInt(btn.getAttribute("data-idx"), 10)];
+    var card = btn.closest(".catalog-item");
+    var lactose = card.querySelector(".ci-lactose").checked;
+    state.sobremesaCart.push({ name: item.name, lactose: lactose, price: item.price + (lactose ? LACTOSE_EXTRA : 0) });
+    updateAll();
+  });
+
+  lancheItemsEl.addEventListener("click", function(e){
+    var btn = e.target.closest(".ci-add");
+    if (!btn) return;
+    var item = LANCHES[parseInt(btn.getAttribute("data-idx"), 10)];
+    var card = btn.closest(".catalog-item");
+    var flavorSel = card.querySelector(".ci-flavor");
+    var flavor = flavorSel ? flavorSel.value : "";
+    if (flavorSel && !flavor){
+      flavorSel.classList.add("invalid");
+      showError("Selecione o sabor antes de adicionar \""+item.name+"\".");
+      return;
+    }
+    state.lancheCart.push({ name: item.name, flavor: flavor, price: item.price });
+    updateAll();
+  });
+
+  sobremesaCartList.addEventListener("click", function(e){
+    var btn = e.target.closest(".cart-remove");
+    if (!btn) return;
+    state.sobremesaCart.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+    updateAll();
+  });
+
+  lancheItemsEl.addEventListener("change", function(e){
+    if (e.target.classList.contains("ci-flavor")) e.target.classList.remove("invalid");
+  });
+
+  lancheCartList.addEventListener("click", function(e){
+    var btn = e.target.closest(".cart-remove");
+    if (!btn) return;
+    state.lancheCart.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+    updateAll();
+  });
+
   comboGrid.addEventListener("click", function(e){
     var opt = e.target.closest(".combo-opt");
     if (!opt) return;
@@ -575,8 +852,12 @@
     state.comboPrice = parseInt(opt.getAttribute("data-price"), 10);
     Array.prototype.forEach.call(comboGrid.children, function(c){ c.classList.remove("selected"); });
     opt.classList.add("selected");
+    var extras = COMBO_EXTRAS[size];
+    incluBannerText.textContent = "Esse combo inclui "+extras.feijao+" porções de feijão. "+extras.saladaText+".";
     incluBanner.style.display = "flex";
     montagemSection.style.display = "block";
+    sobremesaSection.style.display = "block";
+    lancheSection.style.display = "block";
     buildMarmitas(size);
     updateAll();
   });
@@ -666,7 +947,8 @@
   }
 
   function orderReady(){
-    return state.comboSize && state.marmitas.length === state.comboSize && countCompleted() === state.comboSize && clientReady();
+    return !!(state.comboSize && state.marmitas.length === state.comboSize && countCompleted() === state.comboSize &&
+      clientReady() && state.sobremesaWanted !== null && state.lancheWanted !== null);
   }
 
   function updateSubmitBar(){
@@ -678,8 +960,12 @@
       miniProgress.textContent = "Escolha um combo para começar.";
     } else if (!clientReady()){
       miniProgress.textContent = "Preencha seu nome e telefone.";
-    } else {
+    } else if (countCompleted() !== state.comboSize){
       miniProgress.textContent = countCompleted()+" de "+state.comboSize+" marmitas montadas — falta pouco!";
+    } else if (state.sobremesaWanted === null){
+      miniProgress.textContent = "Responda se deseja adicionar sobremesa.";
+    } else if (state.lancheWanted === null){
+      miniProgress.textContent = "Responda se deseja adicionar lanches rápidos.";
     }
   }
 
@@ -706,12 +992,23 @@
 
     var fixedEl = $("repFixed");
     if (state.comboSize){
+      var extras = COMBO_EXTRAS[state.comboSize];
       fixedEl.innerHTML =
-        '<div class="report-row"><span>Feijão (porções)</span><span>'+state.comboSize+'</span></div>'+
-        '<div class="report-row"><span>Salada (porções)</span><span>'+state.comboSize+'</span></div>';
+        '<div class="report-row"><span>Feijão (porções)</span><span>'+extras.feijao+'</span></div>'+
+        '<div class="report-row"><span>Salada</span><span>'+extras.saladaText+'</span></div>';
     } else {
       fixedEl.innerHTML = '<div class="report-empty">Selecione um combo.</div>';
     }
+
+    var repSobremesa = $("repSobremesa");
+    repSobremesa.innerHTML = reportCartRows(state.sobremesaCart) || '<div class="report-empty">Nenhuma sobremesa adicionada.</div>';
+
+    var repLanche = $("repLanche");
+    repLanche.innerHTML = reportCartRows(state.lancheCart) || '<div class="report-empty">Nenhum lanche adicionado.</div>';
+
+    $("repGrandTotal").textContent = state.comboSize ? formatBRL(getGrandTotal()) : "—";
+
+    renderCarts();
   }
 
   function renderReportGroup(elId, obj, emptyMsg){
@@ -792,6 +1089,17 @@
       firstInvalid.scrollIntoView({ behavior:"smooth", block:"center" });
       return false;
     }
+
+    if (state.sobremesaWanted === null){
+      showError("Responda se deseja adicionar sobremesa.");
+      sobremesaSection.scrollIntoView({ behavior:"smooth", block:"center" });
+      return false;
+    }
+    if (state.lancheWanted === null){
+      showError("Responda se deseja adicionar lanches rápidos.");
+      lancheSection.scrollIntoView({ behavior:"smooth", block:"center" });
+      return false;
+    }
     return true;
   }
 
@@ -806,7 +1114,9 @@
     }
     lines.push("📦 *Combo:* "+state.comboSize+" Marmitas — "+formatBRL(state.comboPrice));
     lines.push("");
-    lines.push("✅ Feijão e Salada inclusos automaticamente em todas as marmitas");
+    var extras = COMBO_EXTRAS[state.comboSize];
+    lines.push("🫘 Feijão: "+extras.feijao+" porções");
+    lines.push("🥗 Salada: "+extras.saladaText);
     lines.push("");
     state.marmitas.forEach(function(m, i){
       lines.push("*Marmita "+(i+1)+":*");
@@ -816,8 +1126,28 @@
       lines.push("🥦 Guarnição 02: "+m.secondary);
       lines.push("");
     });
+
+    if (state.sobremesaCart.length){
+      lines.push("🍰 *Sobremesas:*");
+      state.sobremesaCart.forEach(function(item){
+        lines.push("- "+item.name+(item.lactose ? " (Zero lactose)" : "")+" — "+formatBRL(item.price));
+      });
+      lines.push("Subtotal sobremesas: "+formatBRL(getSobremesaTotal()));
+      lines.push("");
+    }
+
+    if (state.lancheCart.length){
+      lines.push("🥪 *Lanches Rápidos:*");
+      state.lancheCart.forEach(function(item){
+        lines.push("- "+item.name+(item.flavor ? " ("+item.flavor+")" : "")+" — "+formatBRL(item.price));
+      });
+      lines.push("Subtotal lanches: "+formatBRL(getLancheTotal()));
+      lines.push("");
+    }
+
     lines.push("------------------------------");
-    lines.push("*Total: "+state.comboSize+" marmitas — "+formatBRL(state.comboPrice)+"*");
+    lines.push("*Valor total do pedido: "+formatBRL(getGrandTotal())+"*");
+    lines.push("*Sinal para confirmação (50%): "+formatBRL(getGrandTotal()/2)+"*");
     return lines.join("\n");
   }
 
@@ -826,12 +1156,16 @@
   var modalCancel = $("modalCancel");
   var pendingWhatsappUrl = null;
 
+  var modalTotalEl = $("modalTotal");
+
   sendBtn.addEventListener("click", function(){
     if (!validateAndHighlight()) return;
     var msg = buildMessage();
     var encoded = encodeURIComponent(msg);
     var number = (kitchenNumberEl.value || DEFAULT_KITCHEN_WHATSAPP || "").replace(/\D/g,"");
     pendingWhatsappUrl = number ? ("https://wa.me/"+number+"?text="+encoded) : ("https://api.whatsapp.com/send?text="+encoded);
+    var total = getGrandTotal();
+    modalTotalEl.textContent = "Valor total: "+formatBRL(total)+" · Sinal (50%): "+formatBRL(total/2);
     confirmModal.classList.add("show");
   });
 
@@ -865,6 +1199,8 @@
     saveTimer = setTimeout(function(){ saveMsg.textContent = ""; }, 1800);
   });
 
+  renderSobremesaCatalog();
+  renderLancheCatalog();
   updateAll();
 })();
 </script>
