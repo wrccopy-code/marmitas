@@ -221,51 +221,6 @@
   .error-box.show{display:block;}
 
   footer{padding:26px 0 20px;}
-  .kitchen-toggle{
-    width:100%;
-    background:var(--green);
-    color:#fff;
-    border:none;
-    border-radius:var(--radius);
-    padding:14px;
-    font-size:.95rem;
-    font-weight:700;
-    display:flex;align-items:center;justify-content:space-between;
-    cursor:pointer;
-  }
-  .kitchen-toggle .arrow{transition:.2s;}
-  .kitchen-toggle.open .arrow{transform:rotate(180deg);}
-  .kitchen-panel{
-    display:none;
-    background:var(--card);
-    border:1px solid var(--border);
-    border-top:none;
-    border-radius:0 0 var(--radius) var(--radius);
-    padding:16px;
-    margin-top:-4px;
-  }
-  .kitchen-panel.open{display:block;}
-  .kitchen-panel h4{
-    margin:16px 0 8px;font-size:.85rem;color:var(--orange-dark);
-    border-bottom:1px solid var(--border);padding-bottom:6px;
-  }
-  .kitchen-panel h4:first-of-type{margin-top:4px;}
-  .report-row{
-    display:flex;justify-content:space-between;
-    font-size:.86rem;padding:5px 0;
-    border-bottom:1px dashed var(--border);
-  }
-  .report-row span:last-child{font-weight:700;color:var(--green-dark);}
-  .report-empty{font-size:.82rem;color:var(--text-soft);padding:6px 0;}
-  .kitchen-config{
-    background:var(--orange-light);
-    border-radius:10px;padding:12px;margin-top:14px;
-  }
-  .kitchen-config label{font-size:.78rem;}
-  .kitchen-config input{margin-bottom:8px;}
-  .kitchen-config .save-msg{font-size:.75rem;color:var(--green-dark);font-weight:600;height:16px;}
-  .kitchen-config small{color:var(--text-soft);display:block;margin-top:2px;font-size:.72rem;}
-
   .brand-footer{text-align:center;font-size:.72rem;color:var(--text-soft);margin-top:18px;}
 
   .modal-overlay{
@@ -500,44 +455,8 @@
 
 <div class="wrap">
   <footer>
-    <button class="kitchen-toggle" id="kitchenToggle">
-      <span>👩‍🍳 Relatório de Produção (Cozinha)</span>
-      <span class="arrow">▼</span>
-    </button>
-    <div class="kitchen-panel" id="kitchenPanel">
-      <div class="report-row"><span><strong>Combo selecionado</strong></span><span id="repCombo">—</span></div>
-
-      <h4>🍖 Proteínas</h4>
-      <div id="repProtein"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
-
-      <h4>🍚 Guarnição 01</h4>
-      <div id="repPrimary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
-
-      <h4>🧄 Molho (massas)</h4>
-      <div id="repSauce"><div class="report-empty">Nenhuma marmita com massa ainda.</div></div>
-
-      <h4>🥦 Guarnição 02</h4>
-      <div id="repSecondary"><div class="report-empty">Nenhuma marmita montada ainda.</div></div>
-
-      <h4>➕ Fixos</h4>
-      <div id="repFixed"><div class="report-empty">Selecione um combo.</div></div>
-
-      <h4>🍰 Sobremesas</h4>
-      <div id="repSobremesa"><div class="report-empty">Nenhuma sobremesa adicionada.</div></div>
-
-      <h4>🥪 Lanches Rápidos</h4>
-      <div id="repLanche"><div class="report-empty">Nenhum lanche adicionado.</div></div>
-
-      <div class="report-row" style="margin-top:8px;"><span><strong>Valor total do pedido</strong></span><span id="repGrandTotal">—</span></div>
-
-      <div class="kitchen-config">
-        <label for="kitchenNumber">Número de WhatsApp para receber os pedidos (com DDD)</label>
-        <input type="tel" id="kitchenNumber" placeholder="Ex: 11987654321">
-        <div class="save-msg" id="saveMsg"></div>
-      </div>
-    </div>
+    <div class="brand-footer">Cozinha da Aymeê Caseira · feito com 🧡</div>
   </footer>
-  <div class="brand-footer">Cozinha da Aymeê Caseira · feito com 🧡</div>
 </div>
 
 <div class="modal-overlay" id="confirmModal">
@@ -585,7 +504,7 @@
     "Moranga caramelizada"
   ];
 
-  var MOLHOS = ["Molho bechamel", "Molho 4 queijos"];
+  var MOLHOS = ["Molho bechamel", "Molho 4 queijos", "Molho ao sugo"];
 
   var NONE_PROTEIN = "Sem proteína";
   var NONE_PRIMARY = "Sem guarnição 01";
@@ -735,20 +654,6 @@
       if (item.flavor) label += " ("+item.flavor+")";
       if (item.lactose) label += " — Zero lactose";
       return '<div class="cart-row"><span>'+escapeHtml(label)+'</span><span>'+formatBRL(item.price)+' <button type="button" class="cart-remove" data-i="'+i+'">✕</button></span></div>';
-    }).join("");
-  }
-
-  function reportCartRows(cart){
-    if (!cart.length) return null;
-    var counts = {};
-    cart.forEach(function(item){
-      var label = item.name;
-      if (item.flavor) label += " ("+item.flavor+")";
-      if (item.lactose) label += " — Zero lactose";
-      counts[label] = (counts[label]||0)+1;
-    });
-    return Object.keys(counts).map(function(k){
-      return '<div class="report-row"><span>'+escapeHtml(k)+'</span><span>'+counts[k]+'x</span></div>';
     }).join("");
   }
 
@@ -973,61 +878,10 @@
     return "R$ "+value.toFixed(2).replace(".", ",");
   }
 
-  function updateReport(){
-    var repCombo = $("repCombo");
-    repCombo.textContent = state.comboSize ? (state.comboSize+" marmitas — "+formatBRL(state.comboPrice)) : "—";
-
-    var counts = { protein:{}, primary:{}, sauce:{}, secondary:{} };
-    state.marmitas.forEach(function(m){
-      if (m.protein) counts.protein[m.protein] = (counts.protein[m.protein]||0)+1;
-      if (m.primary) counts.primary[m.primary] = (counts.primary[m.primary]||0)+1;
-      if (m.sauce) counts.sauce[m.sauce] = (counts.sauce[m.sauce]||0)+1;
-      if (m.secondary) counts.secondary[m.secondary] = (counts.secondary[m.secondary]||0)+1;
-    });
-
-    renderReportGroup("repProtein", counts.protein);
-    renderReportGroup("repPrimary", counts.primary);
-    renderReportGroup("repSauce", counts.sauce, "Nenhuma marmita com massa ainda.");
-    renderReportGroup("repSecondary", counts.secondary);
-
-    var fixedEl = $("repFixed");
-    if (state.comboSize){
-      var extras = COMBO_EXTRAS[state.comboSize];
-      fixedEl.innerHTML =
-        '<div class="report-row"><span>Feijão (porções)</span><span>'+extras.feijao+'</span></div>'+
-        '<div class="report-row"><span>Salada</span><span>'+extras.saladaText+'</span></div>';
-    } else {
-      fixedEl.innerHTML = '<div class="report-empty">Selecione um combo.</div>';
-    }
-
-    var repSobremesa = $("repSobremesa");
-    repSobremesa.innerHTML = reportCartRows(state.sobremesaCart) || '<div class="report-empty">Nenhuma sobremesa adicionada.</div>';
-
-    var repLanche = $("repLanche");
-    repLanche.innerHTML = reportCartRows(state.lancheCart) || '<div class="report-empty">Nenhum lanche adicionado.</div>';
-
-    $("repGrandTotal").textContent = state.comboSize ? formatBRL(getGrandTotal()) : "—";
-
-    renderCarts();
-  }
-
-  function renderReportGroup(elId, obj, emptyMsg){
-    var el = $(elId);
-    var keys = Object.keys(obj);
-    if (!keys.length){
-      el.innerHTML = '<div class="report-empty">'+(emptyMsg || "Nenhuma marmita montada ainda.")+'</div>';
-      return;
-    }
-    keys.sort(function(a,b){ return obj[b]-obj[a]; });
-    el.innerHTML = keys.map(function(k){
-      return '<div class="report-row"><span>'+escapeHtml(k)+'</span><span>'+obj[k]+'x</span></div>';
-    }).join("");
-  }
-
   function updateAll(){
     updateProgress();
     updateSubmitBar();
-    updateReport();
+    renderCarts();
   }
 
   nomeEl.addEventListener("input", function(){ nomeEl.classList.remove("invalid"); updateAll(); });
@@ -1162,7 +1016,7 @@
     if (!validateAndHighlight()) return;
     var msg = buildMessage();
     var encoded = encodeURIComponent(msg);
-    var number = (kitchenNumberEl.value || DEFAULT_KITCHEN_WHATSAPP || "").replace(/\D/g,"");
+    var number = DEFAULT_KITCHEN_WHATSAPP.replace(/\D/g,"");
     pendingWhatsappUrl = number ? ("https://wa.me/"+number+"?text="+encoded) : ("https://api.whatsapp.com/send?text="+encoded);
     var total = getGrandTotal();
     modalTotalEl.textContent = "Valor total: "+formatBRL(total)+" · Sinal (50%): "+formatBRL(total/2);
@@ -1176,27 +1030,6 @@
 
   modalCancel.addEventListener("click", function(){
     confirmModal.classList.remove("show");
-  });
-
-  var kitchenToggle = $("kitchenToggle");
-  var kitchenPanel = $("kitchenPanel");
-  var kitchenNumberEl = $("kitchenNumber");
-  var saveMsg = $("saveMsg");
-  var STORAGE_KEY = "marmita_aymee_kitchen_whatsapp";
-
-  kitchenNumberEl.value = localStorage.getItem(STORAGE_KEY) || DEFAULT_KITCHEN_WHATSAPP || "";
-
-  kitchenToggle.addEventListener("click", function(){
-    var open = kitchenPanel.classList.toggle("open");
-    kitchenToggle.classList.toggle("open", open);
-  });
-
-  var saveTimer = null;
-  kitchenNumberEl.addEventListener("input", function(){
-    localStorage.setItem(STORAGE_KEY, kitchenNumberEl.value.trim());
-    saveMsg.textContent = "Número salvo ✔";
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(function(){ saveMsg.textContent = ""; }, 1800);
   });
 
   renderSobremesaCatalog();
